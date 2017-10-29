@@ -13,5 +13,10 @@ cabal-version:        >=1.10
 executable jweb
   main-is:              Main.hs
   build-depends:        base >= 4.7 && < 5
+                      , jose-jwt
+                      , bytestring
+                      , cryptonite
+                      , HsOpenSSL
+                      , cmdargs
   hs-source-dirs:       src
   default-language:     Haskell2010

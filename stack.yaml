@@ -5,3 +5,7 @@ resolver: lts-9.10
 # User packages to be built.
 packages:
 - .
+
+# Extra directories used by stack for building
+extra-include-dirs: [/usr/local/opt/openssl/include]
+extra-lib-dirs: [/usr/local/opt/openssl/lib]
