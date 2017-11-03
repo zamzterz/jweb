@@ -18,5 +18,7 @@ executable jweb
                       , cryptonite
                       , HsOpenSSL
                       , cmdargs
+  other-modules:        Encrypt
+                      , Decrypt
   hs-source-dirs:       src
   default-language:     Haskell2010
