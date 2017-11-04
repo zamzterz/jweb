@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Encrypt (encrypt) where
+module Jweb.Encrypt (encrypt) where
 
 import Jose.Jwa
 import Jose.Jwe
