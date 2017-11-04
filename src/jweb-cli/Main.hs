@@ -6,8 +6,8 @@ import qualified Data.ByteString.Char8 as C
 import System.Console.CmdArgs
 import Jose.Jwt
 
-import Encrypt
-import Decrypt
+import Jweb.Encrypt
+import Jweb.Decrypt
 
 handleEncryption payload publicKeyPath = do
     jwe <- encrypt publicKeyPath (C.pack payload)
