@@ -1,5 +1,5 @@
 name:                 jweb
-version:              0.0.1.0
+version:              0.0.1
 synopsis:             Simple web service for JWE experimentation.
 license:              BSD3
 license-file:         LICENSE
