@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: arekczarnik/docker-circleci-haskell
+    steps:
+      - checkout
+
+      - run:
+          name: Install system dependencies
+          command: apt-get update -qq && apt-get install -y --no-install-recommends libssl-dev
+
+      - restore_cache:
+          key: v1-stack-cache
+
+      - run:
+          name: Build jweb
+          command: stack build --fast
+
+      - save_cache:
+          paths:
+            - ~/.stack
+          key: v1-stack-cache
+
+      - run:
+          name: Run unit tests
+          command: stack test --no-terminal
