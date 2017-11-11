@@ -17,17 +17,16 @@ import OpenSSL.RSA
 import Crypto.Random (MonadRandom)
 
 -- | Decrypt a JWE with the private key given by the file path.
-decrypt :: FilePath -> B.ByteString -> IO (Either JwtError JwtContent)
-decrypt privateKeyPath jwt = do
-    privateKey <- createPrivateKeyJwk privateKeyPath
+decrypt :: String -> B.ByteString -> IO (Either JwtError JwtContent)
+decrypt privateKeyData jwt = do
+    privateKey <- createPrivateKeyJwk privateKeyData
     case privateKey of
         Just key -> unpackJwe key jwt
         Nothing -> return (Left (KeyError "Could not parse private key"))
 
 -- | Create a JWK from a private RSA key in PEM format read from file.
-createPrivateKeyJwk :: FilePath -> IO (Maybe Jwk)
-createPrivateKeyJwk rsaKeyFilePath = do
-    rsaPrivateKeyData <- readFile rsaKeyFilePath
+createPrivateKeyJwk :: String -> IO (Maybe Jwk)
+createPrivateKeyJwk rsaPrivateKeyData = do
     parsedRsaPrivateKey <- readPrivateKey rsaPrivateKeyData PwNone
     let rsaPrivateKey = toKeyPair parsedRsaPrivateKey :: Maybe RSAKeyPair
     return (fmap privateRsaKeyToJwk rsaPrivateKey)
