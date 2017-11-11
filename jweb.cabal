@@ -49,5 +49,6 @@ test-suite unit-tests-jweb
     jose-jwt,
     jweb,
     tasty,
-    tasty-hunit
+    tasty-hunit,
+    tasty-program
 

@@ -4,22 +4,23 @@ module Main where
 import qualified Data.ByteString.Char8 as C
 
 import System.Console.CmdArgs
-import Jose.Jwt
+import System.Exit (die)
 
+import Jose.Jwt
 import Jweb.Encrypt
 import Jweb.Decrypt
 
 handleEncryption publicKeyData payload = do
     jwe <- encrypt publicKeyData (C.pack payload)
     case jwe of
-        Right (Jwt jwt) -> print jwt
-        Left error -> print error
+        Right (Jwt jwt) -> putStrLn (C.unpack jwt)
+        Left error -> die (show error)
 
 handleDecryption privateKeyData jwt = do
     decrypted <- decrypt privateKeyData (C.pack jwt)
     case decrypted of
         Right (Jwe (hdr, claims)) -> putStrLn (show hdr ++ "." ++ show claims)
-        Left error -> print error
+        Left error -> die (show error)
 
 data Jweb = Encrypt {payload :: String, publicKeyPath :: FilePath}
           | Decrypt {jwt :: String, privateKeyPath :: FilePath}
