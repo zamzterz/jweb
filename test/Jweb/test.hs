@@ -40,7 +40,22 @@ jwebUnitTests = testGroup "Jweb lib: unit tests"
 
         step "Decrypting with key2.priv"
         decrypted <- decrypt otherPrivateKeyData encrypted
-        Left (BadCrypto)  @=? decrypted
+        Left (BadCrypto) @=? decrypted
+
+    , testCase "Should reject bad key for encryption with Left error" $ do
+        privateKeyData <- readFile "test/key1.priv" -- can't use private key for encryption
+        encrypted <- encrypt privateKeyData (C.pack "test_data")
+        case encrypted of
+            Right a -> assertFailure "Expected a KeyError"
+            Left (KeyError msg) -> return () -- do nothing
+            _ -> assertFailure "Expected a KeyError"
+
+    , testCase "Should reject bad key for decryption with Left error" $ do
+        publicKeyData <- readFile "test/key1.pub" -- can't use public key for decryption
+        decrypted <- decrypt publicKeyData (C.pack testJwe)
+        case decrypted of
+            Left (KeyError msg) -> return () -- do nothing
+            fail -> assertFailure ("Expected a KeyError, got " ++ show fail)
     ]
 
 cliTests = testGroup "Jweb CLI: application test"
