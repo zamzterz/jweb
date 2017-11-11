@@ -9,14 +9,14 @@ import Jose.Jwt
 import Jweb.Encrypt
 import Jweb.Decrypt
 
-handleEncryption payload publicKeyPath = do
-    jwe <- encrypt publicKeyPath (C.pack payload)
+handleEncryption publicKeyData payload = do
+    jwe <- encrypt publicKeyData (C.pack payload)
     case jwe of
         Right (Jwt jwt) -> print jwt
         Left error -> print error
 
-handleDecryption jwt privateKeyPath = do
-    decrypted <- decrypt privateKeyPath (C.pack jwt)
+handleDecryption privateKeyData jwt = do
+    decrypted <- decrypt privateKeyData (C.pack jwt)
     case decrypted of
         Right (Jwe (hdr, claims)) -> putStrLn (show hdr ++ "." ++ show claims)
         Left error -> print error
@@ -38,5 +38,9 @@ options = modes [encryptMode, decryptMode]
 main = do
     command <- cmdArgs options
     case command of
-        Encrypt payload publicKeyPath -> handleEncryption payload publicKeyPath
-        Decrypt jwt privateKeyPath -> handleDecryption jwt privateKeyPath
+        Encrypt payload publicKeyPath -> do
+            publicKeyData <- readFile publicKeyPath
+            handleEncryption publicKeyData payload
+        Decrypt jwt privateKeyPath -> do
+            privateKeyData <- readFile privateKeyPath
+            handleDecryption privateKeyData jwt
