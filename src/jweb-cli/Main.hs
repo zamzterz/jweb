@@ -12,8 +12,8 @@ import Jweb.Decrypt
 handleEncryption publicKeyData payload = do
     jwe <- encrypt publicKeyData (C.pack payload)
     case jwe of
-        Right (Jwt jwt) -> print jwt
         Left error -> print error
+        Right (Jwt jwt) -> putStrLn (C.unpack jwt)
 
 handleDecryption privateKeyData jwt = do
     decrypted <- decrypt privateKeyData (C.pack jwt)
