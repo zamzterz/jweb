@@ -9,6 +9,8 @@ import Jose.Jwt
 
 import qualified Data.ByteString as B
 
+import System.IO.Error (tryIOError)
+
 import qualified Crypto.PubKey.RSA as RSA
 import OpenSSL.EVP.PKey
 import OpenSSL.PEM
@@ -27,9 +29,12 @@ decrypt privateKeyData jwt = do
 -- | Create a JWK from a private RSA key in PEM format read from file.
 createPrivateKeyJwk :: String -> IO (Maybe Jwk)
 createPrivateKeyJwk rsaPrivateKeyData = do
-    parsedRsaPrivateKey <- readPrivateKey rsaPrivateKeyData PwNone
-    let rsaPrivateKey = toKeyPair parsedRsaPrivateKey :: Maybe RSAKeyPair
-    return (fmap privateRsaKeyToJwk rsaPrivateKey)
+    parsedRsaPrivateKey <- tryIOError (readPrivateKey rsaPrivateKeyData PwNone)
+    case parsedRsaPrivateKey of
+        Right key -> do
+            let rsaPrivateKey = toKeyPair key
+            return (fmap privateRsaKeyToJwk rsaPrivateKey)
+        _ -> return Nothing
 
 -- Map a private key in a RSA key pair to a JWK.
 privateRsaKeyToJwk :: RSAKeyPair -> Jwk

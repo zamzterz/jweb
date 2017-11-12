@@ -9,6 +9,8 @@ import Jose.Jwt
 
 import qualified Data.ByteString as B
 
+import System.IO.Error (tryIOError)
+
 import qualified Crypto.PubKey.RSA as RSA
 import OpenSSL.EVP.PKey
 import OpenSSL.PEM
@@ -27,9 +29,12 @@ encrypt publicKeyData claims = do
 -- | Create a JWK from a public RSA key in PEM format read from file.
 createPublicKeyJwk :: String -> IO (Maybe Jwk)
 createPublicKeyJwk rsaPublicKeyData = do
-    parsedRsaPublicKey <- readPublicKey rsaPublicKeyData
-    let rsaPublicKey = toPublicKey parsedRsaPublicKey :: Maybe RSAPubKey
-    return (fmap publicRsaKeyToJwk rsaPublicKey)
+    parsedRsaPublicKey <- tryIOError (readPublicKey rsaPublicKeyData)
+    case parsedRsaPublicKey of
+        Right key -> do
+            let rsaPublicKey = toPublicKey key
+            return (fmap publicRsaKeyToJwk rsaPublicKey)
+        _ -> return Nothing
 
 -- Map a public RSA key to a JWK.
 publicRsaKeyToJwk :: RSAPubKey -> Jwk
