@@ -74,7 +74,7 @@ cliTests = testGroup "Jweb CLI: application test"
     , testProgram "Should successfully decrypt" "jweb-cli" ["decrypt", testJwe, "test/key1.priv"] Nothing
     ]
 
-specTests = with waiApp $ do
+specTests = with (waiApp "test/static") $ do
     let matchPartial expected = MatchBody $ \_ body -> case C.isInfixOf expected (L.toStrict body) of
          True  -> Nothing
          False -> Just $  "Expected to find somewhere in body: " ++ C.unpack expected ++ ",\n"
@@ -112,6 +112,10 @@ specTests = with waiApp $ do
         it "gives an error for request missing 'key' parameter" $ do
             privateKeyData <- liftIO $ readFile "test/key1.priv"
             postHtmlForm "/api/decrypt" [("jwe", testJwe)] `shouldRespondWith` [json| {error: "Param: key not found!"} |] {matchStatus = 400}
+
+    describe "static file serving" $ do
+        it "serves static test file" $ do
+            get "/test.html" `shouldRespondWith` 200
 
 restTests :: IO TestTree
 restTests = testSpec "Jweb REST API: application test" specTests
