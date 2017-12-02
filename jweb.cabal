@@ -33,7 +33,8 @@ library
     scotty,
     text,
     wai,
-    wai-extra
+    wai-extra,
+    wai-middleware-static
 
 executable jweb-cli
   default-language:   Haskell2010
@@ -46,9 +47,9 @@ executable jweb-cli
     jose-jwt,
     jweb
 
-executable jweb-rest
+executable jweb-app
   default-language:   Haskell2010
-  hs-source-dirs:     src/jweb-rest
+  hs-source-dirs:     src/jweb-app
   main-is:            Main.hs
   build-depends:
     base >= 4.7 && < 5,

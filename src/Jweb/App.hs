@@ -17,7 +17,8 @@ import Jweb.Decrypt (decrypt)
 
 import Network.HTTP.Types.Status
 import Network.Wai
-import Network.Wai.Middleware.RequestLogger
+import Network.Wai.Middleware.RequestLogger (logStdout)
+import Network.Wai.Middleware.Static
 
 import Web.Scotty.Trans
 
@@ -44,9 +45,17 @@ handleEx (StringEx e) = do
     status status500
     json $ object [ "error" .= e ]
 
-scottyApp :: ScottyT Except IO ()
-scottyApp = do
+indexStaticRewrite :: String -> Maybe String
+indexStaticRewrite "" = Just "index.html" -- Rewrite root path to index.html
+indexStaticRewrite incomingPath = Just incomingPath
+staticServingPolicy basePath = (policy indexStaticRewrite) >-> (addBase basePath)
+staticMiddleware :: FilePath -> Middleware
+staticMiddleware basePath = staticPolicy (staticServingPolicy basePath)
+
+scottyApp :: String -> ScottyT Except IO ()
+scottyApp staticDir = do
     middleware logStdout
+    middleware (staticMiddleware staticDir)
     defaultHandler handleEx
 
     post "/api/encrypt" $ do
@@ -67,6 +76,6 @@ scottyApp = do
             Left (Jwt.KeyError error) -> raise (BadRequest (T.unpack error))
             Left error -> raise (InternalServerError (show error))
 
-waiApp :: IO Application
-waiApp = scottyAppT id scottyApp
+waiApp :: String -> IO Application
+waiApp staticDir = scottyAppT id (scottyApp staticDir)
 
